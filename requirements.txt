@@ -1,0 +1,12 @@
+google-genai
+fastapi
+uvicorn
+python-dotenv
+streamlit
+chromadb
+langchain-community
+langchain-text-splitters
+sentence-transformers
+requests
+pandas
+chardet
