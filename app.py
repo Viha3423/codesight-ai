@@ -118,7 +118,7 @@ if st.button("Search Codebase", type="primary"):
         with st.spinner("Searching uploaded context..."):
             try:
                 vector_db = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
-                search_results = vector_db.similarity_search(user_query, k=2)
+                search_results = vector_db.similarity_search(user_query, k=4)
 
                 if not search_results:
                     st.error("No relevant code snippets found in vector store.")
