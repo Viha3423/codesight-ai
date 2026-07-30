@@ -81,8 +81,8 @@ if st.button("Upload & Index File", type="secondary"):
                 else:
                     python_splitter = RecursiveCharacterTextSplitter.from_language(
                         language=Language.PYTHON, 
-                        chunk_size=300, 
-                        chunk_overlap=40
+                        chunk_size=1000, 
+                        chunk_overlap=200
                     )
                     chunks = python_splitter.split_documents(docs)
 
