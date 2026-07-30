@@ -38,17 +38,17 @@ def get_embeddings():
 embeddings = get_embeddings()
 
 # --- SECTION 1: CODEBASE FILE UPLOAD ---
-st.header("1. Upload Your Codebase")
-uploaded_files = st.file_uploader(
-    "Upload source code files (.py, .js, .txt, etc.)", 
-    accept_multiple_files=True
+st.header("1. Upload Your Code File")
+uploaded_file = st.file_uploader(
+    "Upload a source code file (.py, .js, .txt, .json, etc.)", 
+    accept_multiple_files=False  # Restricted to single-file upload
 )
 
-if st.button("Upload & Index Code", type="secondary"):
-    if not uploaded_files:
-        st.warning("Please select at least one file to upload.")
+if st.button("Upload & Index File", type="secondary"):
+    if not uploaded_file:
+        st.warning("Please select a file to upload.")
     else:
-        with st.spinner("Indexing codebase into vector store..."):
+        with st.spinner("Indexing code file into vector store..."):
             try:
                 # 1. Clean upload directory
                 if os.path.exists(UPLOAD_DIR):
@@ -62,15 +62,12 @@ if st.button("Upload & Index Code", type="secondary"):
                         except Exception as e:
                             pass
 
-                # 2. Save uploaded files
-                saved_file_paths = []
-                for file in uploaded_files:
-                    file_path = os.path.join(UPLOAD_DIR, file.name)
-                    with open(file_path, "wb") as f:
-                        f.write(file.getvalue())
-                    saved_file_paths.append(file_path)
+                # 2. Save single uploaded file
+                saved_file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+                with open(saved_file_path, "wb") as f:
+                    f.write(uploaded_file.getvalue())
 
-                # 3. Load & Chunk Files
+                # 3. Load & Chunk File
                 loader = DirectoryLoader(
                     UPLOAD_DIR, 
                     glob="**/*", 
@@ -80,7 +77,7 @@ if st.button("Upload & Index Code", type="secondary"):
                 docs = loader.load()
 
                 if not docs:
-                    st.error("No readable text/code files found in upload.")
+                    st.error("Could not read text/code from uploaded file.")
                 else:
                     python_splitter = RecursiveCharacterTextSplitter.from_language(
                         language=Language.PYTHON, 
@@ -99,12 +96,10 @@ if st.button("Upload & Index Code", type="secondary"):
                         pass
 
                     vector_db.add_documents(chunks)
-                    st.success(f"Successfully indexed {len(saved_file_paths)} file(s) into ChromaDB!")
+                    st.success(f"Successfully indexed `{uploaded_file.name}` into ChromaDB!")
 
             except Exception as e:
                 st.error(f"Error during indexing: {e}")
-
-st.divider()
 
 # --- SECTION 2: QUERY CODEBASE ---
 st.header("2. Ask Questions About Your Code")
